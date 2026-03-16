@@ -26,3 +26,8 @@ func GenerateJWT(username string) (string, error) {
 	}
 	return "Bearer " + signedToken, nil
 }
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}

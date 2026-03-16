@@ -1,6 +1,10 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"eltsen00/CurrencyExchangeApp/backend/controllers"
+
+	"github.com/gin-gonic/gin"
+)
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
@@ -8,12 +12,8 @@ func SetupRouter() *gin.Engine {
 	{
 		auth := api.Group("/auth")
 		{
-			auth.POST("/login", func(c *gin.Context) {
-				c.JSON(200, gin.H{"message": "Login successful"})
-			})
-			auth.POST("/register", func(c *gin.Context) {
-				c.JSON(200, gin.H{"message": "Registration successful"})
-			})
+			auth.POST("/login", controllers.Login)
+			auth.POST("/register", controllers.Register)
 		}
 	}
 	return r
