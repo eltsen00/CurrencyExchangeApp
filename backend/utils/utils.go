@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -30,4 +31,27 @@ func GenerateJWT(username string) (string, error) {
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+func ParseJWT(tokenString string) (string, error) {
+	if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+		tokenString = tokenString[7:]
+	}
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte("your_secret_key"), nil // 提供secert给Parse函数
+	})
+	if err != nil {
+		return "", err
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		username, ok := claims["username"].(string)
+		if !ok {
+			return "", errors.New("Username not found in token or invalid type")
+		}
+		return username, nil
+	}
+	return "", jwt.ErrSignatureInvalid
 }
