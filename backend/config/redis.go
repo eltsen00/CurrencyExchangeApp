@@ -3,6 +3,7 @@ package config
 import (
 	"eltsen00/CurrencyExchangeApp/backend/global"
 	"log"
+	"os"
 
 	"github.com/go-redis/redis"
 )
@@ -16,7 +17,8 @@ func InitRedis() {
 
 	_, err := RedisClient.Ping().Result()
 	if err != nil {
-		log.Fatalf("Failed to connect to Redis: %v", err)
+		log.Fatalf("Failed to connect to Redis: %v, system don't start", err)
+		os.Exit(1)
 	}
 	global.RedisDB = RedisClient
 }
