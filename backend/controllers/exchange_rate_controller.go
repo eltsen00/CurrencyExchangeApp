@@ -3,9 +3,11 @@ package controllers
 import (
 	"eltsen00/CurrencyExchangeApp/backend/global"
 	"eltsen00/CurrencyExchangeApp/backend/models"
+	"errors"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func CreateExchangeRate(c *gin.Context) {
@@ -30,7 +32,11 @@ func CreateExchangeRate(c *gin.Context) {
 func GetExchangeRates(c *gin.Context) {
 	var exchangeRates []models.ExchangeRate
 	if err := global.Db.Find(&exchangeRates).Error; err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, gin.H{"error": "Exchange rates not found"})
+		} else {
+			c.JSON(500, gin.H{"error": err.Error()})
+		}
 		return
 	}
 	c.JSON(200, exchangeRates)
