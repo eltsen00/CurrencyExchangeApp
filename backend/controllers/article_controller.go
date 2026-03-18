@@ -52,12 +52,22 @@ func GetArticles(c *gin.Context) {
 		var articles []models.Article
 
 		// Fetch articles from the database
+		// if err := global.Db.Find(&articles).Error; err != nil {
+		// 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		// 		c.JSON(404, gin.H{"error": "No articles found"})
+		// 	} else {
+		// 		c.JSON(500, gin.H{"error": "Failed to retrieve articles"})
+		// 	}
+		// 	return
+		// }
+
+		// 查询多条记录时，gorm.ErrRecordNotFound 不会被返回,因此直接判断 err 是否为 nil 即可
 		if err := global.Db.Find(&articles).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				c.JSON(404, gin.H{"error": "No articles found"})
-			} else {
-				c.JSON(500, gin.H{"error": "Failed to retrieve articles"})
-			}
+			c.JSON(500, gin.H{"error": "Failed to retrieve articles"})
+			return
+		}
+		if len(articles) == 0 {
+			c.JSON(404, gin.H{"error": "No articles found"})
 			return
 		}
 
